@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026학년도 정명고등학교 교무조직</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Malgun Gothic', sans-serif; font-size: 13px; color: #333; }
+        
+        /* Pastel Buttons */
+        .btn-pastel-primary {
+            background-color: #e0eafd !important;
+            color: #1c3d5a !important;
+            border: 1px solid #b3d1ff !important;
+        }
+        .btn-pastel-primary:hover {
+            background-color: #cbdcf7 !important;
+            color: #1c3d5a !important;
+        }
+        .btn-pastel-success {
+            background-color: #e6f9ed !important;
+            color: #1e4620 !important;
+            border: 1px solid #c2f0d0 !important;
+        }
+        .btn-pastel-success:hover {
+            background-color: #d1f4dc !important;
+            color: #1e4620 !important;
+        }
+        .btn-pastel-warning {
+            background-color: #fff3cd !important;
+            color: #664d03 !important;
+            border: 1px solid #ffe69c !important;
+        }
+        .btn-pastel-warning:hover {
+            background-color: #ffecb5 !important;
+            color: #664d03 !important;
+        }
+        .btn-pastel-secondary {
+            background-color: #f1f3f5 !important;
+            color: #495057 !important;
+            border: 1px solid #dee2e6 !important;
+        }
+        .btn-pastel-secondary:hover {
+            background-color: #e9ecef !important;
+            color: #495057 !important;
+        }
+        .btn-pastel-danger {
+            background-color: #fde8e8 !important;
+            color: #9b1c1c !important;
+            border: 1px solid #f8b4b4 !important;
+        }
+        .btn-pastel-danger:hover {
+            background-color: #fcd9d9 !important;
+            color: #9b1c1c !important;
+        }
+        
+        .teacher-item {
+            cursor: grab; padding: 3px 6px; margin: 2px;
+            background-color: #fff; border: 1px solid #ced4da;
+            border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            display: inline-flex; justify-content: space-between; align-items: center;
+            gap: 6px; font-size: 11px; user-select: none;
+        }
+        .teacher-item:active { cursor: grabbing; }
+        .teacher-item .subject {
+            font-size: 0.8em; color: #6c757d; background: #e9ecef;
+            padding: 1px 4px; border-radius: 8px;
+        }
+        
+        /* Teacher text colors based on role/gender/custom choices */
+        .teacher-item.color-black span:first-child { color: #212529; }
+        .teacher-item.color-blue span:first-child { color: #0a58ca; font-weight: bold; }
+        .teacher-item.color-red span:first-child { color: #d32f2f; font-weight: bold; }
+
+        /* Left Pools Sidebar layout */
+        .dropzone-pool {
+            min-height: 480px;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+            background-color: #fafafa;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .dropzone-pool .teacher-item {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin: 0;
+            padding: 3px 6px;
+        }
+
+        .dropzone {
+            min-height: 30px; min-width: 70px; background-color: #fff;
+            border: 1px dashed #cbd5e1; border-radius: 4px; padding: 2px;
+            transition: background-color 0.2s;
+            display: flex; flex-direction: column; gap: 2px; align-items: center; justify-content: center;
+        }
+        .dropzone.dragover { background-color: #f1f5f9; border-color: #3b82f6; }
+        .dropzone.multi-drop { 
+            min-height: 34px; flex-direction: row; flex-wrap: wrap; 
+            align-content: flex-start; justify-content: flex-start; gap: 2px;
+            width: 100%;
+        }
+
+        /* Pastel Tables Styling */
+        .org-table {
+            border-collapse: collapse;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            border-color: #e2e8f0 !important;
+        }
+        .org-table th { 
+            background-color: #f1f5f9 !important; 
+            color: #475569 !important; 
+            text-align: center; 
+            font-weight: 600; 
+            font-size: 11px; 
+            padding: 5px 4px !important; 
+            border-color: #cbd5e1 !important; 
+        }
+        .org-table td { 
+            vertical-align: middle; 
+            border-color: #e2e8f0 !important; 
+            padding: 3px 5px !important; 
+            font-size: 11px; 
+        }
+
+        /* Pastel Heading Colors */
+        .border-primary-pastel { border-left-color: #3b82f6 !important; background-color: #eff6ff !important; color: #1e3a8a; }
+        .border-success-pastel { border-left-color: #10b981 !important; background-color: #ecfdf5 !important; color: #064e3b; }
+        .border-info-pastel { border-left-color: #f59e0b !important; background-color: #fffbeb !important; color: #78350f; }
+        .border-warning-pastel { border-left-color: #8b5cf6 !important; background-color: #f5f3ff !important; color: #4c1d95; }
+        .border-secondary-pastel { border-left-color: #64748b !important; background-color: #f8fafc !important; color: #0f172a; }
+
+        /* PDF Export Styles */
+        .exporting .dropzone { border: none !important; background: transparent !important; min-height: 20px !important; padding: 0 !important; }
+        .exporting .teacher-item { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; background: transparent !important; display: inline !important; }
+        .exporting .teacher-item .subject { display: none !important; }
+        .exporting .teacher-item:not(:last-child)::after { content: ", "; color: #212529; font-weight: normal; }
+        .exporting input.form-control { display: none !important; }
+        .exporting .org-table { font-size: 10px; }
+        .page-break { page-break-before: always; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .col-md-9 { width: 100% !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <!-- Sidebar: Teacher Pools -->
+            <div class="col-md-3 no-print" style="position: sticky; top: 10px; align-self: flex-start; max-height: 98vh; overflow-y: auto;">
+                <div class="card shadow-sm border-0 bg-white">
+                    <!-- Combined Logo and Title Section -->
+                    <div class="text-center p-3 border-bottom border-light" style="background: #ffffff; border-radius: 4px 4px 0 0;">
+                        <img src="school_emblem.png" alt="정명고등학교" style="max-height: 75px; width: auto; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));">
+                        <h6 class="fw-bold m-0" style="color: #1e3a8a; letter-spacing: -0.5px; font-size: 14px;">교무조직 편성</h6>
+                    </div>
+                    
+                    <!-- Information / Help Section -->
+                    <div class="px-3 pt-2 pb-2 border-bottom" style="background-color: #f8fafc; font-size: 11px; line-height: 1.5; color: #475569;">
+                        <div class="fw-bold text-dark mb-1" style="font-size: 11.5px;">💡 사용 설명</div>
+                        <ul class="m-0 p-0 ps-3" style="list-style-type: disc;">
+                            <li>교사명 <strong>더블클릭</strong> 시 정보 수정 가능</li>
+                            <li>표에 <strong>배치</strong> 시 명단에서 제외됨</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between align-items-center mb-2 gap-1 px-1">
+                            <button class="btn btn-sm btn-pastel-primary fw-bold" id="btn-add-teacher" style="min-width: 60px;">추가</button>
+                            <input type="text" id="search-teacher" class="form-control form-control-sm" placeholder="이름/과목 검색...">
+                        </div>
+                        
+                        <!-- 3 Columns Side-by-Side Pools -->
+                        <div class="row g-1">
+                            <!-- Pool 1 -->
+                            <div class="col-4">
+                                <div class="card shadow-none border h-100" style="border-color: #cbd5e1 !important;">
+                                    <div class="card-header fw-bold text-center py-1 px-1 border-bottom bg-light" style="font-size: 10px; color: #1e3a8a; min-height: 38px; display: flex; align-items: center; justify-content: center;">
+                                        1~3. 부장/담임/비담임
+                                    </div>
+                                    <div class="card-body p-1">
+                                        <div id="teacher-pool-1" class="dropzone-pool" data-group="1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Pool 2 -->
+                            <div class="col-4">
+                                <div class="card shadow-none border h-100" style="border-color: #cbd5e1 !important;">
+                                    <div class="card-header fw-bold text-center py-1 px-1 border-bottom bg-light" style="font-size: 10px; color: #4c1d95; min-height: 38px; display: flex; align-items: center; justify-content: center;">
+                                        4. 부서별 교사현황
+                                    </div>
+                                    <div class="card-body p-1">
+                                        <div id="teacher-pool-2" class="dropzone-pool" data-group="2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Pool 3 -->
+                            <div class="col-4">
+                                <div class="card shadow-none border h-100" style="border-color: #cbd5e1 !important;">
+                                    <div class="card-header fw-bold text-center py-1 px-1 border-bottom bg-light" style="font-size: 10px; color: #0f172a; min-height: 38px; display: flex; align-items: center; justify-content: center;">
+                                        5. 과목별 교사현황
+                                    </div>
+                                    <div class="card-body p-1">
+                                        <div id="teacher-pool-3" class="dropzone-pool" data-group="3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content: Org Chart -->
+            <div class="col-md-9">
+                <!-- Top Toolbar with Actions -->
+                <div class="d-flex justify-content-end mb-3 no-print gap-2">
+                    <button class="btn btn-pastel-success btn-sm shadow-sm fw-bold" onclick="saveState()">작업 저장</button>
+                    <button class="btn btn-pastel-warning btn-sm shadow-sm fw-bold" onclick="loadStateManual()">불러오기</button>
+                    <button class="btn btn-pastel-secondary btn-sm shadow-sm fw-bold" onclick="resetState()">초기화</button>
+                    <button class="btn btn-pastel-success btn-sm shadow-sm fw-bold" onclick="saveExcel()">EXCEL로 저장</button>
+                    <button class="btn btn-pastel-danger btn-sm shadow-sm fw-bold" onclick="savePDF()">PDF로 저장</button>
+                </div>
+                
+                <div id="export-area" class="bg-white p-4 shadow-sm border rounded">
+                    <h4 class="text-center fw-bold mb-4">정명고등학교 교무조직 편성</h4>
+                    
+                    <!-- 1. 부장교사 및 교과부장 -->
+                    <h5 class="fw-bold p-2 border-start border-4 border-primary-pastel small">1. 부장교사 및 교과부장</h5>
+                    <table class="table table-bordered text-center align-middle mb-4 org-table">
+                        <thead>
+                            <tr>
+                                <th>부서명</th><th style="width: 15%">부장명</th>
+                                <th>부서명</th><th style="width: 15%">부장명</th>
+                                <th>부서명</th><th style="width: 15%">부장명</th>
+                                <th>비고</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>교무기획부</td><td><div class="dropzone" id="zone-head-교무기획부" data-group="1" data-role="head"></div></td>
+                                <td>교육연구부</td><td><div class="dropzone" id="zone-head-교육연구부" data-group="1" data-role="head"></div></td>
+                                <td>학생안전부</td><td><div class="dropzone" id="zone-head-학생안전부" data-group="1" data-role="head"></div></td>
+                                <td rowspan="8"><input type="text" id="input-head-remarks" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr>
+                                <td>교육과정부</td><td><div class="dropzone" id="zone-head-교육과정부" data-group="1" data-role="head"></div></td>
+                                <td>진로상담부</td><td><div class="dropzone" id="zone-head-진로상담부" data-group="1" data-role="head"></div></td>
+                                <td>교육정보부</td><td><div class="dropzone" id="zone-head-교육정보부" data-group="1" data-role="head"></div></td>
+                            </tr>
+                            <tr>
+                                <td>인문사회부</td><td><div class="dropzone" id="zone-head-인문사회부" data-group="1" data-role="head"></div></td>
+                                <td>자연과학부</td><td><div class="dropzone" id="zone-head-자연과학부" data-group="1" data-role="head"></div></td>
+                                <td>창의체험부</td><td><div class="dropzone" id="zone-head-창의체험부" data-group="1" data-role="head"></div></td>
+                            </tr>
+                            <tr>
+                                <td>1학년부</td><td><div class="dropzone" id="zone-head-1학년부" data-group="1" data-role="head"></div></td>
+                                <td>2학년부</td><td><div class="dropzone" id="zone-head-2학년부" data-group="1" data-role="head"></div></td>
+                                <td>3학년부</td><td><div class="dropzone" id="zone-head-3학년부" data-group="1" data-role="head"></div></td>
+                            </tr>
+                            <!-- 교과부장 구분 세분화 -->
+                            <tr class="table-light">
+                                <td colspan="6" class="fw-bold text-center py-1" style="font-size: 11px; background-color: #f8fafc; color: #475569;">교과부장</td>
+                            </tr>
+                            <tr>
+                                <td>국어</td><td><div class="dropzone" id="zone-subhead-국어" data-group="1" data-role="head"></div></td>
+                                <td>영어</td><td><div class="dropzone" id="zone-subhead-영어" data-group="1" data-role="head"></div></td>
+                                <td>수학</td><td><div class="dropzone" id="zone-subhead-수학" data-group="1" data-role="head"></div></td>
+                            </tr>
+                            <tr>
+                                <td>사회</td><td><div class="dropzone" id="zone-subhead-사회" data-group="1" data-role="head"></div></td>
+                                <td>과학</td><td><div class="dropzone" id="zone-subhead-과학" data-group="1" data-role="head"></div></td>
+                                <td>예체능</td><td><div class="dropzone" id="zone-subhead-예체능" data-group="1" data-role="head"></div></td>
+                            </tr>
+                            <tr>
+                                <td>교양</td><td><div class="dropzone" id="zone-subhead-교양" data-group="1" data-role="head"></div></td>
+                                <td colspan="4" class="bg-light"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- 2. 학년 담임 및 부담임 현황 (교과 열 삭제) -->
+                    <h5 class="fw-bold p-2 border-start border-4 border-success-pastel mt-4 small">2. 학년 담임 및 부담임 현황</h5>
+                    
+                    <h6 class="fw-bold mt-2 text-success" style="font-size: 12px;">■ 1학년</h6>
+                    <table class="table table-sm table-bordered text-center align-middle mb-3 org-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">반</th><th style="width: 20%">담임명</th><th style="width: 20%">부담임</th>
+                                <th style="width: 10%">반</th><th style="width: 20%">담임명</th><th style="width: 20%">부담임</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grade1-body"></tbody>
+                    </table>
+
+                    <h6 class="fw-bold mt-3 text-success" style="font-size: 12px;">■ 2학년</h6>
+                    <table class="table table-sm table-bordered text-center align-middle mb-3 org-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">반</th><th style="width: 20%">담임명</th><th style="width: 20%">부담임</th>
+                                <th style="width: 10%">반</th><th style="width: 20%">담임명</th><th style="width: 20%">부담임</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grade2-body"></tbody>
+                    </table>
+
+                    <h6 class="fw-bold mt-3 text-success" style="font-size: 12px;">■ 3학년</h6>
+                    <table class="table table-sm table-bordered text-center align-middle mb-4 org-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">반</th><th style="width: 20%">담임명</th><th style="width: 20%">위탁/비고</th>
+                                <th style="width: 10%">반</th><th style="width: 20%">담임명</th><th style="width: 20%">위탁/비고</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grade3-body"></tbody>
+                    </table>
+
+                    <!-- 3. 비담임 교사 현황 (인원수 추가 및 자동 계산) -->
+                    <h5 class="fw-bold p-2 border-start border-4 border-info-pastel mt-4 small">3. 비담임 교사 현황</h5>
+                    <table class="table table-bordered text-center align-middle mb-4 org-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%">과목군</th>
+                                <th style="width: 12%">인원수</th>
+                                <th>비담임 교사명 (드래그하여 배치)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="non-homeroom-row" data-subject="국어">
+                                <td class="fw-bold">국어</td>
+                                <td class="count-cell fw-bold text-primary text-center">0</td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-nonhomeroom-국어" data-group="1" style="min-height: 32px;"></div></td>
+                            </tr>
+                            <tr class="non-homeroom-row" data-subject="수학">
+                                <td class="fw-bold">수학</td>
+                                <td class="count-cell fw-bold text-primary text-center">0</td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-nonhomeroom-수학" data-group="1" style="min-height: 32px;"></div></td>
+                            </tr>
+                            <tr class="non-homeroom-row" data-subject="영어">
+                                <td class="fw-bold">영어</td>
+                                <td class="count-cell fw-bold text-primary text-center">0</td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-nonhomeroom-영어" data-group="1" style="min-height: 32px;"></div></td>
+                            </tr>
+                            <tr class="non-homeroom-row" data-subject="사회">
+                                <td class="fw-bold">사회</td>
+                                <td class="count-cell fw-bold text-primary text-center">0</td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-nonhomeroom-사회" data-group="1" style="min-height: 32px;"></div></td>
+                            </tr>
+                            <tr class="non-homeroom-row" data-subject="과학">
+                                <td class="fw-bold">과학</td>
+                                <td class="count-cell fw-bold text-primary text-center">0</td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-nonhomeroom-과학" data-group="1" style="min-height: 32px;"></div></td>
+                            </tr>
+                            <tr class="non-homeroom-row" data-subject="예체능/교양">
+                                <td class="fw-bold">예체능/교양</td>
+                                <td class="count-cell fw-bold text-primary text-center">0</td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-nonhomeroom-예체능_교양" data-group="1" style="min-height: 32px;"></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="page-break"></div>
+
+                    <!-- 4. 부서별 교사현황 (부장, 부원 분리 및 자동 합계) -->
+                    <h5 class="fw-bold p-2 border-start border-4 border-warning-pastel mt-4 small">4. 부서별 교사현황</h5>
+                    <table class="table table-bordered text-center align-middle mb-4 org-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%">부서명</th>
+                                <th style="width: 10%">인원수</th>
+                                <th style="width: 18%">부장</th>
+                                <th>부원 (드래그하여 배치)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dept-body"></tbody>
+                    </table>
+
+                    <div class="page-break"></div>
+
+                    <!-- 5. 과목별 교사현황 (명칭 변경 및 30학급 제거) -->
+                    <h5 class="fw-bold p-2 border-start border-4 border-secondary-pastel mt-4 small">5. 과목별 교사현황</h5>
+                    <table class="table table-bordered align-middle org-table" id="subject-stats-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="width: 8%; text-align: center;">구분</th>
+                                <th rowspan="2" style="width: 10%; text-align: center;">과목</th>
+                                <th colspan="3" style="text-align: center;">교사수</th>
+                                <th colspan="2" style="text-align: center;">교원명단</th>
+                                <th rowspan="2" style="width: 18%; text-align: center;">비고</th>
+                            </tr>
+                            <tr>
+                                <th style="width: 7%; text-align: center;">정교사</th>
+                                <th style="width: 7%; text-align: center;">기간제</th>
+                                <th style="width: 7%; text-align: center;">총</th>
+                                <th style="text-align: center;">정교사</th>
+                                <th style="text-align: center;">기간제교사</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 관리자 -->
+                            <tr class="subject-row" data-category="관리자" data-subject="교장">
+                                <td rowspan="3" class="fw-bold text-center" style="background-color: #f8fafc;">관리자</td>
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">교장</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-교장" data-group="3" data-subject="교장" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-교장" data-group="3" data-subject="교장" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-교장" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="관리자" data-subject="교감">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">교감</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-교감" data-group="3" data-subject="교감" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-교감" data-group="3" data-subject="교감" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-교감" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subtotal-row" data-category="관리자" style="background-color: #f8fafc;">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">소계</td>
+                                <td class="stat-regular-subtotal fw-bold text-center text-primary">0</td>
+                                <td class="stat-contract-subtotal fw-bold text-center text-danger">0</td>
+                                <td class="stat-total-subtotal fw-bold text-center text-dark">0</td>
+                                <td class="subtotal-regular-count fw-bold text-center text-primary" style="font-size: 11px;">0</td>
+                                <td class="subtotal-contract-count fw-bold text-center text-danger" style="font-size: 11px;">0</td>
+                                <td></td>
+                            </tr>
+
+                            <!-- 교과교사 -->
+                            <tr class="subject-row" data-category="교과교사" data-subject="국어">
+                                <td rowspan="22" class="fw-bold text-center" style="background-color: #f8fafc; writing-mode: vertical-lr; text-orientation: upright; letter-spacing: 2px; padding: 15px 4px !important;">교과교사</td>
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">국어</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-국어" data-group="3" data-subject="국어" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-국어" data-group="3" data-subject="국어" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-국어" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="수학">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">수학</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-수학" data-group="3" data-subject="수학" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-수학" data-group="3" data-subject="수학" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-수학" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="영어">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">영어</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-영어" data-group="3" data-subject="영어" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-영어" data-group="3" data-subject="영어" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-영어" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="통합사회">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">통합사회</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-통합사회" data-group="3" data-subject="통합사회" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-통합사회" data-group="3" data-subject="통합사회" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-통합사회" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="일반사회">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">일반사회</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-일반사회" data-group="3" data-subject="일반사회" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-일반사회" data-group="3" data-subject="일반사회" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-일반사회" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="역사">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">역사</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-역사" data-group="3" data-subject="역사" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-역사" data-group="3" data-subject="역사" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-역사" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="윤리">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">윤리</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-윤리" data-group="3" data-subject="윤리" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-윤리" data-group="3" data-subject="윤리" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-윤리" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="지리">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">지리</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-지리" data-group="3" data-subject="지리" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-지리" data-group="3" data-subject="지리" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-지리" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="통합과학">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">통합과학</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-통합과학" data-group="3" data-subject="통합과학" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-통합과학" data-group="3" data-subject="통합과학" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-통합과학" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="물리">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">물리</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-물리" data-group="3" data-subject="물리" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-물리" data-group="3" data-subject="물리" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-물리" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="화학">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">화학</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-화학" data-group="3" data-subject="화학" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-화학" data-group="3" data-subject="화학" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-화학" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="생명과학">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">생명과학</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-생명과학" data-group="3" data-subject="생명과학" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-생명과학" data-group="3" data-subject="생명과학" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-생명과학" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="지구과학">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">지구과학</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-지구과학" data-group="3" data-subject="지구과학" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-지구과학" data-group="3" data-subject="지구과학" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-지구과학" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="체육">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">체육</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-체육" data-group="3" data-subject="체육" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-체육" data-group="3" data-subject="체육" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-체육" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="음악">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">음악</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-음악" data-group="3" data-subject="음악" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-음악" data-group="3" data-subject="음악" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-음악" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="미술">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">미술</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-미술" data-group="3" data-subject="미술" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-미술" data-group="3" data-subject="미술" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-미술" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="한문">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">한문</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-한문" data-group="3" data-subject="한문" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-한문" data-group="3" data-subject="한문" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-한문" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="정보">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">정보</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-정보" data-group="3" data-subject="정보" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-정보" data-group="3" data-subject="정보" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-정보" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="중국어">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">중국어</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-중국어" data-group="3" data-subject="중국어" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-중국어" data-group="3" data-subject="중국어" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-중국어" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="일본어">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">일본어</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-일본어" data-group="3" data-subject="일본어" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-일본어" data-group="3" data-subject="일본어" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-일본어" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="교과교사" data-subject="진로">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">진로</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-진로" data-group="3" data-subject="진로" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-진로" data-group="3" data-subject="진로" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-진로" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subtotal-row" data-category="교과교사" style="background-color: #f8fafc;">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">소계</td>
+                                <td class="stat-regular-subtotal fw-bold text-center text-primary">0</td>
+                                <td class="stat-contract-subtotal fw-bold text-center text-danger">0</td>
+                                <td class="stat-total-subtotal fw-bold text-center text-dark">0</td>
+                                <td class="subtotal-regular-count fw-bold text-center text-primary" style="font-size: 11px;">0</td>
+                                <td class="subtotal-contract-count fw-bold text-center text-danger" style="font-size: 11px;">0</td>
+                                <td></td>
+                            </tr>
+
+                            <!-- 비교과교사 -->
+                            <tr class="subject-row" data-category="비교과교사" data-subject="보건">
+                                <td rowspan="4" class="fw-bold text-center" style="background-color: #f8fafc; writing-mode: vertical-lr; text-orientation: upright; letter-spacing: 2px; padding: 15px 4px !important;">비교과교사</td>
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">보건</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-보건" data-group="3" data-subject="보건" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-보건" data-group="3" data-subject="보건" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-보건" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="비교과교사" data-subject="사서">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">사서</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-사서" data-group="3" data-subject="사서" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-사서" data-group="3" data-subject="사서" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-사서" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subject-row" data-category="비교과교사" data-subject="전문상담">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">전문상담</td>
+                                <td class="stat-regular text-center"></td>
+                                <td class="stat-contract text-center"></td>
+                                <td class="stat-total fw-bold text-center"></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-regular-전문상담" data-group="3" data-subject="전문상담" data-type="regular"></div></td>
+                                <td><div class="dropzone multi-drop text-start" id="zone-subject-contract-전문상담" data-group="3" data-subject="전문상담" data-type="contract"></div></td>
+                                <td><input type="text" id="input-subject-remarks-전문상담" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                            </tr>
+                            <tr class="subtotal-row" data-category="비교과교사" style="background-color: #f8fafc;">
+                                <td class="fw-bold text-center" style="background-color: #f8fafc;">소계</td>
+                                <td class="stat-regular-subtotal fw-bold text-center text-primary">0</td>
+                                <td class="stat-contract-subtotal fw-bold text-center text-danger">0</td>
+                                <td class="stat-total-subtotal fw-bold text-center text-dark">0</td>
+                                <td class="subtotal-regular-count fw-bold text-center text-primary" style="font-size: 11px;">0</td>
+                                <td class="subtotal-contract-count fw-bold text-center text-danger" style="font-size: 11px;">0</td>
+                                <td></td>
+                            </tr>
+
+                            <!-- 교사계 (Total) -->
+                            <tr class="total-row" style="background-color: #f1f5f9;">
+                                <td colspan="2" class="fw-bold text-center" style="background-color: #e2e8f0;">교사계</td>
+                                <td class="stat-regular-total fw-bold text-center text-primary" style="background-color: #e2e8f0;">0</td>
+                                <td class="stat-contract-total fw-bold text-center text-danger" style="background-color: #e2e8f0;">0</td>
+                                <td class="stat-total-total fw-bold text-center text-dark" style="background-color: #cbd5e1;">0</td>
+                                <td class="total-regular-count fw-bold text-center text-primary" style="font-size: 11px; background-color: #e2e8f0;">0</td>
+                                <td class="total-contract-count fw-bold text-center text-danger" style="font-size: 11px; background-color: #e2e8f0;">0</td>
+                                <td style="background-color: #e2e8f0;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Edit Modal -->
+    <div class="modal fade" id="teacherModal" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header bg-light py-2">
+            <h6 class="modal-title fw-bold">교사 정보 편집</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body py-3">
+            <input type="hidden" id="teacher-id">
+            <div class="mb-2">
+                <label class="form-label text-muted small mb-1">이름</label>
+                <input type="text" id="teacher-name" class="form-control form-control-sm">
+            </div>
+            <div class="mb-2">
+                <label class="form-label text-muted small mb-1">과목</label>
+                <input type="text" id="teacher-subject" class="form-control form-control-sm">
+            </div>
+            <input type="hidden" id="teacher-color" value="black">
+          </div>
+          <div class="modal-footer py-2">
+            <button type="button" class="btn btn-sm btn-outline-danger me-auto" id="btn-delete-teacher">삭제</button>
+            <button type="button" class="btn btn-sm btn-primary" id="btn-save-teacher">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 초기 교사 데이터 (캡처 화면 기준으로 이름, 과목, 색상 완벽 세팅)
+        let teachers = [
+            { name: '김영희', subject: '교장', color: 'black' },
+            { name: '김정연', subject: '교감', color: 'black' },
+            
+            { name: '오인석', subject: '국어', color: 'black' },
+            { name: '정혜숙', subject: '국어', color: 'black' },
+            { name: '천세령', subject: '국어', color: 'black' },
+            { name: '최준선', subject: '국어', color: 'black' },
+            { name: '우재식', subject: '국어', color: 'black' },
+            { name: '차민경', subject: '국어', color: 'black' },
+            { name: '전선하', subject: '국어', color: 'black' },
+            { name: '선다현', subject: '국어', color: 'black' },
+            { name: '노윤정', subject: '국어', color: 'black' },
+            { name: '김미령', subject: '국어', color: 'black' },
+            
+            { name: '박지호', subject: '수학', color: 'black' },
+            { name: '김조은', subject: '수학', color: 'black' },
+            { name: '김지연', subject: '수학', color: 'black' },
+            { name: '박대용', subject: '수학', color: 'black' },
+            { name: '유서화', subject: '수학', color: 'black' },
+            { name: '윤범노', subject: '수학', color: 'black' },
+            { name: '황성일', subject: '수학', color: 'black' },
+            { name: '김수진', subject: '수학', color: 'black' },
+            { name: '이용구', subject: '수학', color: 'black' },
+            { name: '우근원', subject: '물리', color: 'black' },
+            
+            { name: '이계영', subject: '영어', color: 'black' },
+            { name: '이상진', subject: '영어', color: 'black' },
+            { name: '이윤경', subject: '영어', color: 'black' },
+            { name: '이상희', subject: '영어', color: 'black' },
+            { name: '이경진', subject: '영어', color: 'black' },
+            { name: '서희은', subject: '영어', color: 'black' },
+            { name: '강창호', subject: '영어', color: 'black' },
+            { name: '홍애정', subject: '영어', color: 'black' },
+            
+            { name: '김다현', subject: '통합사회', color: 'black' },
+            { name: '최성태', subject: '통합사회', color: 'black' },
+            { name: '박서현', subject: '통합사회', color: 'black' },
+            { name: '배영미', subject: '통합과학', color: 'black' },
+            
+            { name: '김명선', subject: '일반사회', color: 'black' },
+            { name: '한세희', subject: '일반사회', color: 'black' },
+            { name: '박인화', subject: '일반사회', color: 'black' },
+            
+            { name: '백승현', subject: '역사', color: 'black' },
+            { name: '백초원', subject: '역사', color: 'black' },
+            { name: '양진우', subject: '역사', color: 'black' },
+            
+            { name: '배세희', subject: '윤리', color: 'black' },
+            { name: '이승환', subject: '윤리', color: 'black' },
+            { name: '홍석민', subject: '지리', color: 'black' },
+            { name: '맹소현', subject: '지리', color: 'black' },
+            
+            { name: '홍종선', subject: '통합과학', color: 'black' },
+            { name: '김재구', subject: '통합과학', color: 'black' },
+            { name: '김성규', subject: '물리', color: 'black' },
+            
+            { name: '김영주', subject: '화학', color: 'black' },
+            { name: '김지현', subject: '화학', color: 'black' },
+            
+            { name: '정승원', subject: '생명과학', color: 'black' },
+            { name: '황예림', subject: '생명과학', color: 'black' },
+            { name: '노희령', subject: '지구과학', color: 'black' },
+            
+            { name: '김정수', subject: '체육', color: 'black' },
+            { name: '윤인철', subject: '체육', color: 'black' },
+            { name: '김광태', subject: '체육', color: 'black' },
+            
+            { name: '양현영', subject: '음악', color: 'black' },
+            
+            { name: '배종성', subject: '미술', color: 'black' },
+            { name: '장보람', subject: '미술', color: 'black' },
+            
+            { name: '김기만', subject: '한문', color: 'black' },
+            
+            { name: '최형규', subject: '정보', color: 'black' },
+            { name: '이재혁', subject: '정보', color: 'black' },
+            
+            { name: '김은정', subject: '중국어', color: 'black' },
+            { name: '안다미', subject: '일본어', color: 'black' },
+            { name: '안동은', subject: '진로', color: 'black' },
+            
+            { name: '원혜민', subject: '보건', color: 'black' },
+            { name: '민희경', subject: '사서', color: 'black' },
+            { name: '이성재', subject: '전문상담', color: 'black' }
+        ].map((t, i) => ({ id: 't' + i, name: t.name, subject: t.subject, color: t.color }));
+
+        document.addEventListener('DOMContentLoaded', () => {
+            generateTables();
+            renderPools();
+
+            // Pools Sortable
+            ['1', '2', '3'].forEach(num => {
+                new Sortable(document.getElementById(`teacher-pool-${num}`), {
+                    group: `group-${num}`,
+                    animation: 150,
+                    sort: true,
+                    onAdd: function (evt) {
+                        sortPool(evt.to);
+                    }
+                });
+            });
+
+            // Init Dropzones
+            initDropzones();
+
+            // Auto Load Progress on start
+            const loaded = loadState();
+            if (loaded) {
+                console.log('Saved layout state loaded automatically.');
+            }
+
+            // Search
+            document.getElementById('search-teacher').addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                document.querySelectorAll('.dropzone-pool .teacher-item').forEach(item => {
+                    const match = item.dataset.name.toLowerCase().includes(term) || item.dataset.subject.toLowerCase().includes(term);
+                    item.style.display = match ? 'flex' : 'none';
+                });
+            });
+
+            // Double click to remove from board and return to corresponding pool
+            document.addEventListener('dblclick', (e) => {
+                const item = e.target.closest('.dropzone .teacher-item');
+                if (item) {
+                    const zone = item.closest('.dropzone');
+                    const groupNum = zone.dataset.group || '1';
+                    const poolEl = document.getElementById(`teacher-pool-${groupNum}`);
+                    
+                    if (poolEl) {
+                        poolEl.appendChild(item);
+                        sortPool(poolEl);
+                    } else {
+                        item.remove();
+                    }
+                    
+                    if (zone.dataset.role === 'homeroom') {
+                        const td = zone.closest('td');
+                        const subjectCell = td ? td.nextElementSibling : null;
+                        if (subjectCell && subjectCell.classList.contains('table-cell-subject')) {
+                            const remaining = zone.querySelector('.teacher-item');
+                            subjectCell.textContent = remaining ? remaining.dataset.subject : '';
+                        }
+                    }
+
+                    if (groupNum === '1') {
+                        updateNonHomeroomCounts();
+                    }
+                    if (groupNum === '2') {
+                        updateDeptCounts();
+                    }
+                    if (groupNum === '3') {
+                        updateSubjectStatsTable();
+                    }
+                }
+            });
+
+            // Add Teacher Modal
+            document.getElementById('btn-add-teacher').addEventListener('click', () => {
+                document.getElementById('teacher-id').value = 'new';
+                document.getElementById('teacher-name').value = '';
+                document.getElementById('teacher-subject').value = '';
+                document.getElementById('teacher-color').value = 'black';
+                document.getElementById('btn-delete-teacher').style.display = 'none';
+                new bootstrap.Modal(document.getElementById('teacherModal')).show();
+            });
+
+            // Save Teacher
+            document.getElementById('btn-save-teacher').addEventListener('click', () => {
+                const id = document.getElementById('teacher-id').value;
+                const name = document.getElementById('teacher-name').value.trim();
+                const subject = document.getElementById('teacher-subject').value.trim();
+                const color = document.getElementById('teacher-color').value;
+                if(!name) return alert('이름을 입력하세요.');
+                if(!subject) return alert('과목을 입력하세요.');
+
+                if(id === 'new') {
+                    const newId = 't' + Date.now();
+                    const newTeacher = { id: newId, name, subject, color };
+                    teachers.push(newTeacher);
+                    
+                    // Add to all three pools
+                    ['1', '2', '3'].forEach(num => {
+                        const pool = document.getElementById(`teacher-pool-${num}`);
+                        if (pool) {
+                            const div = document.createElement('div');
+                            div.className = `teacher-item color-${color}`;
+                            div.dataset.id = newId;
+                            div.dataset.name = name;
+                            div.dataset.subject = subject;
+                            div.dataset.color = color;
+                            div.innerHTML = `<span>${name}</span> <span class="subject text-muted" style="font-size: 9px; background: transparent; padding: 0;">${subject}</span>`;
+                            div.addEventListener('dblclick', (e) => {
+                                e.stopPropagation();
+                                openEditModal(newId);
+                            });
+                            pool.appendChild(div);
+                            sortPool(pool);
+                        }
+                    });
+                } else {
+                    const t = teachers.find(x => x.id === id);
+                    if(t) { 
+                        t.name = name; 
+                        t.subject = subject; 
+                        t.color = color;
+                        
+                        // Update all instances in pools and tables
+                        document.querySelectorAll(`.teacher-item[data-id="${id}"]`).forEach(item => {
+                            item.className = `teacher-item color-${color}`;
+                            item.dataset.name = name;
+                            item.dataset.subject = subject;
+                            item.dataset.color = color;
+                            item.innerHTML = `<span>${name}</span> <span class="subject text-muted" style="font-size: 9px; background: transparent; padding: 0;">${subject}</span>`;
+                            
+                            const zone = item.closest('.dropzone');
+                            if (zone && zone.dataset.role === 'homeroom') {
+                                const td = zone.closest('td');
+                                const subjectCell = td ? td.nextElementSibling : null;
+                                if (subjectCell && subjectCell.classList.contains('table-cell-subject')) {
+                                    subjectCell.textContent = subject;
+                                }
+                            }
+                        });
+                        
+                        // Resort the pools
+                        ['1', '2', '3'].forEach(num => {
+                            const pool = document.getElementById(`teacher-pool-${num}`);
+                            if (pool) sortPool(pool);
+                        });
+                        
+                        updateNonHomeroomCounts();
+                        updateDeptCounts();
+                        updateSubjectStatsTable();
+                    }
+                }
+                bootstrap.Modal.getInstance(document.getElementById('teacherModal')).hide();
+            });
+
+            // Delete Teacher
+            document.getElementById('btn-delete-teacher').addEventListener('click', () => {
+                if(confirm('이 교사를 명단에서 완전히 삭제하시겠습니까? (배치된 위치를 포함하여 완전히 삭제됩니다)')) {
+                    const id = document.getElementById('teacher-id').value;
+                    teachers = teachers.filter(x => x.id !== id);
+                    
+                    document.querySelectorAll(`.teacher-item[data-id="${id}"]`).forEach(item => {
+                        const zone = item.closest('.dropzone');
+                        item.remove();
+                        if (zone && zone.dataset.role === 'homeroom') {
+                            const td = zone.closest('td');
+                            const subjectCell = td ? td.nextElementSibling : null;
+                            if (subjectCell && subjectCell.classList.contains('table-cell-subject')) {
+                                const remaining = zone.querySelector('.teacher-item');
+                                subjectCell.textContent = remaining ? remaining.dataset.subject : '';
+                            }
+                        }
+                    });
+                    
+                    updateNonHomeroomCounts();
+                    updateDeptCounts();
+                    updateSubjectStatsTable();
+                    bootstrap.Modal.getInstance(document.getElementById('teacherModal')).hide();
+                }
+            });
+        });
+
+        function openEditModal(id) {
+            const t = teachers.find(x => x.id === id);
+            if (!t) return;
+            document.getElementById('teacher-id').value = t.id;
+            document.getElementById('teacher-name').value = t.name;
+            document.getElementById('teacher-subject').value = t.subject;
+            document.getElementById('teacher-color').value = t.color || 'black';
+            document.getElementById('btn-delete-teacher').style.display = 'block';
+            new bootstrap.Modal(document.getElementById('teacherModal')).show();
+        }
+
+        // 왼쪽 명단 교사 가나다 순으로 정렬
+        function sortPool(poolEl) {
+            const items = Array.from(poolEl.querySelectorAll('.teacher-item'));
+            items.sort((a, b) => {
+                return a.dataset.name.localeCompare(b.dataset.name, 'ko');
+            });
+            items.forEach(item => poolEl.appendChild(item));
+        }
+
+        function renderPools() {
+            ['1', '2', '3'].forEach(num => {
+                const pool = document.getElementById(`teacher-pool-${num}`);
+                if (!pool) return;
+                pool.innerHTML = '';
+                teachers.forEach(t => {
+                    const div = document.createElement('div');
+                    div.className = `teacher-item color-${t.color || 'black'}`;
+                    div.dataset.id = t.id;
+                    div.dataset.name = t.name;
+                    div.dataset.subject = t.subject;
+                    div.dataset.color = t.color || 'black';
+                    div.innerHTML = `<span>${t.name}</span> <span class="subject text-muted" style="font-size: 9px; background: transparent; padding: 0;">${t.subject}</span>`;
+                    
+                    div.addEventListener('dblclick', (e) => {
+                        e.stopPropagation();
+                        openEditModal(t.id);
+                    });
+                    
+                    pool.appendChild(div);
+                });
+                sortPool(pool);
+            });
+            updateNonHomeroomCounts();
+            updateDeptCounts();
+            updateSubjectStatsTable();
+        }
+
+        function generateTables() {
+            // Grades (교과 열 삭제)
+            const grade1 = document.getElementById('grade1-body');
+            const grade2 = document.getElementById('grade2-body');
+            const grade3 = document.getElementById('grade3-body');
+
+            grade1.innerHTML = '';
+            grade2.innerHTML = '';
+            grade3.innerHTML = '';
+
+            for (let i = 1; i <= 5; i++) {
+                grade1.innerHTML += `<tr>
+                    <td style="white-space: nowrap;">${i}반</td><td><div class="dropzone" id="zone-homeroom-1-${i}" data-group="1" data-role="homeroom" style="min-height: 28px;"></div></td><td><div class="dropzone" id="zone-assistant-1-${i}" data-group="1" style="min-height: 28px;"></div></td>
+                    <td style="white-space: nowrap;">${i+5}반</td><td><div class="dropzone" id="zone-homeroom-1-${i+5}" data-group="1" data-role="homeroom" style="min-height: 28px;"></div></td><td><div class="dropzone" id="zone-assistant-1-${i+5}" data-group="1" style="min-height: 28px;"></div></td>
+                </tr>`;
+                grade2.innerHTML += `<tr>
+                    <td style="white-space: nowrap;">${i}반</td><td><div class="dropzone" id="zone-homeroom-2-${i}" data-group="1" data-role="homeroom" style="min-height: 28px;"></div></td><td><div class="dropzone" id="zone-assistant-2-${i}" data-group="1" style="min-height: 28px;"></div></td>
+                    <td style="white-space: nowrap;">${i+5}반</td><td><div class="dropzone" id="zone-homeroom-2-${i+5}" data-group="1" data-role="homeroom" style="min-height: 28px;"></div></td><td><div class="dropzone" id="zone-assistant-2-${i+5}" data-group="1" style="min-height: 28px;"></div></td>
+                </tr>`;
+                grade3.innerHTML += `<tr>
+                    <td style="white-space: nowrap;">${i}반</td><td><div class="dropzone" id="zone-homeroom-3-${i}" data-group="1" data-role="homeroom" style="min-height: 28px;"></div></td><td><input type="text" id="input-homeroom-3-${i}" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                    <td style="white-space: nowrap;">${i+5}반</td><td><div class="dropzone" id="zone-homeroom-3-${i+5}" data-group="1" data-role="homeroom" style="min-height: 28px;"></div></td><td><input type="text" id="input-homeroom-3-${i+5}" class="form-control form-control-sm border-0 text-center" style="font-size: 11px;"></td>
+                </tr>`;
+            }
+
+            // Departments (부장/부원 및 인원수 분리)
+            const depts = ['교무기획부', '교육연구부', '학생안전부', '교육과정부', '진로상담부', '교육정보부', '인문사회부', '자연과학부', '창의체험부', '1학년부', '2학년부', '3학년부'];
+            const deptBody = document.getElementById('dept-body');
+            deptBody.innerHTML = '';
+            depts.forEach(d => {
+                deptBody.innerHTML += `
+                <tr class="dept-row">
+                    <td class="fw-bold text-center">${d}</td>
+                    <td class="dept-count fw-bold text-primary text-center">0</td>
+                    <td><div class="dropzone text-center" id="zone-dept-head-${d}" data-group="2" data-dept-role="head" style="min-height: 32px;"></div></td>
+                    <td><div class="dropzone multi-drop text-start" id="zone-dept-member-${d}" data-group="2" data-dept-role="member" style="min-height: 32px;"></div></td>
+                </tr>`;
+            });
+        }
+
+        function initDropzones() {
+            document.querySelectorAll('.dropzone').forEach(zone => {
+                const groupNum = zone.dataset.group || '1';
+                new Sortable(zone, {
+                    group: `group-${groupNum}`,
+                    animation: 150,
+                    max: zone.classList.contains('multi-drop') ? 100 : 1,
+                    onAdd: function (evt) {
+                        const itemEl = evt.item;
+                        const isMulti = zone.classList.contains('multi-drop');
+                        
+                        // For single dropzones, move existing child back to pool instead of destroying
+                        if (!isMulti && zone.children.length > 1) {
+                            Array.from(zone.children).forEach(child => {
+                                if (child !== itemEl) {
+                                    const poolEl = document.getElementById(`teacher-pool-${groupNum}`);
+                                    if (poolEl) {
+                                        poolEl.appendChild(child);
+                                        sortPool(poolEl);
+                                    } else {
+                                        child.remove();
+                                    }
+                                }
+                            });
+                        }
+                        
+                        // Update subject cell for homerooms
+                        if (zone.dataset.role === 'homeroom') {
+                            const td = zone.closest('td');
+                            const subjectCell = td ? td.nextElementSibling : null;
+                            if (subjectCell && subjectCell.classList.contains('table-cell-subject')) {
+                                subjectCell.textContent = itemEl.dataset.subject;
+                            }
+                        }
+
+                        if (groupNum === '1') {
+                            updateNonHomeroomCounts();
+                        }
+                        if (groupNum === '2') {
+                            updateDeptCounts();
+                        }
+                        if (groupNum === '3') {
+                            updateSubjectStatsTable();
+                        }
+                    },
+                    onRemove: function(evt) {
+                        if (zone.dataset.role === 'homeroom') {
+                            const td = zone.closest('td');
+                            const subjectCell = td ? td.nextElementSibling : null;
+                            if (subjectCell && subjectCell.classList.contains('table-cell-subject')) {
+                                const remaining = zone.querySelector('.teacher-item');
+                                subjectCell.textContent = remaining ? remaining.dataset.subject : '';
+                            }
+                        }
+
+                        if (groupNum === '1') {
+                            updateNonHomeroomCounts();
+                        }
+                        if (groupNum === '2') {
+                            updateDeptCounts();
+                        }
+                        if (groupNum === '3') {
+                            updateSubjectStatsTable();
+                        }
+                    }
+                });
+            });
+        }
+
+        // 비담임 인원수 실시간 계산
+        function updateNonHomeroomCounts() {
+            document.querySelectorAll('.non-homeroom-row').forEach(row => {
+                const zone = row.querySelector('.dropzone');
+                const count = zone ? zone.children.length : 0;
+                const countCell = row.querySelector('.count-cell');
+                if (countCell) {
+                    countCell.textContent = count;
+                }
+            });
+        }
+
+        // 부서별 (부장+부원) 합계 인원수 실시간 계산
+        function updateDeptCounts() {
+            document.querySelectorAll('.dept-row').forEach(row => {
+                const headZone = row.querySelector('.dropzone[data-dept-role="head"]');
+                const memberZone = row.querySelector('.dropzone[data-dept-role="member"]');
+                const headCount = headZone ? headZone.children.length : 0;
+                const memberCount = memberZone ? memberZone.children.length : 0;
+                const total = headCount + memberCount;
+                const countCell = row.querySelector('.dept-count');
+                if (countCell) {
+                    countCell.textContent = total;
+                }
+            });
+        }
+
+        function updateSubjectStatsTable() {
+            let categoryStats = {
+                '관리자': { regular: 0, contract: 0 },
+                '교과교사': { regular: 0, contract: 0 },
+                '비교과교사': { regular: 0, contract: 0 }
+            };
+            
+            // For each subject row
+            document.querySelectorAll('.subject-row').forEach(row => {
+                const category = row.dataset.category;
+                const regularZone = row.querySelector('.dropzone[data-type="regular"]');
+                const contractZone = row.querySelector('.dropzone[data-type="contract"]');
+                
+                const regularCount = regularZone ? regularZone.children.length : 0;
+                const contractCount = contractZone ? contractZone.children.length : 0;
+                const totalCount = regularCount + contractCount;
+                
+                row.querySelector('.stat-regular').textContent = regularCount > 0 ? regularCount : '';
+                row.querySelector('.stat-contract').textContent = contractCount > 0 ? contractCount : '';
+                row.querySelector('.stat-total').textContent = totalCount > 0 ? totalCount : '';
+                
+                categoryStats[category].regular += regularCount;
+                categoryStats[category].contract += contractCount;
+            });
+            
+            // For each subtotal row
+            document.querySelectorAll('.subtotal-row').forEach(row => {
+                const category = row.dataset.category;
+                const stats = categoryStats[category];
+                const total = stats.regular + stats.contract;
+                
+                row.querySelector('.stat-regular-subtotal').textContent = stats.regular;
+                row.querySelector('.stat-contract-subtotal').textContent = stats.contract;
+                row.querySelector('.stat-total-subtotal').textContent = total;
+                
+                row.querySelector('.subtotal-regular-count').textContent = stats.regular;
+                row.querySelector('.subtotal-contract-count').textContent = stats.contract;
+            });
+            
+            // For total row
+            const totalRegular = categoryStats['관리자'].regular + categoryStats['교과교사'].regular + categoryStats['비교과교사'].regular;
+            const totalContract = categoryStats['관리자'].contract + categoryStats['교과교사'].contract + categoryStats['비교과교사'].contract;
+            const grandTotal = totalRegular + totalContract;
+            
+            const totalRow = document.querySelector('.total-row');
+            if (totalRow) {
+                totalRow.querySelector('.stat-regular-total').textContent = totalRegular;
+                totalRow.querySelector('.stat-contract-total').textContent = totalContract;
+                totalRow.querySelector('.stat-total-total').textContent = grandTotal;
+                
+                totalRow.querySelector('.total-regular-count').textContent = totalRegular;
+                totalRow.querySelector('.total-contract-count').textContent = totalContract;
+            }
+        }
+
+        // 배치 데이터 LocalStorage 저장 기능
+        function saveState() {
+            const state = {
+                placements: {},
+                inputs: {},
+                teachers: teachers
+            };
+            
+            // Save placements for all dropzones and pools
+            document.querySelectorAll('.dropzone, .dropzone-pool').forEach(zone => {
+                if (zone.id) {
+                    const teacherIds = Array.from(zone.children).map(child => child.dataset.id);
+                    state.placements[zone.id] = teacherIds;
+                }
+            });
+            
+            // Save text inputs
+            document.querySelectorAll('input[type="text"]').forEach((input, index) => {
+                const inputId = input.id || `input-index-${index}`;
+                state.inputs[inputId] = input.value;
+            });
+            
+            localStorage.setItem('jungmyung_org_state', JSON.stringify(state));
+            alert('작성 중인 교무조직 편성 상태가 안전하게 저장되었습니다!');
+        }
+
+        // 배치 데이터 LocalStorage 불러오기 기능
+        function loadState() {
+            const stateStr = localStorage.getItem('jungmyung_org_state');
+            if (!stateStr) return false;
+            
+            try {
+                const state = JSON.parse(stateStr);
+                if (state.teachers) {
+                    teachers = state.teachers.map(t => {
+                        t.color = 'black';
+                        t.name = t.name.replace(/\s*\([^)]*\)/g, '');
+                        return t;
+                    });
+                }
+                
+                // Reset pools first
+                renderPools();
+                
+                // Restore placements
+                for (const zoneId in state.placements) {
+                    const zone = document.getElementById(zoneId);
+                    if (zone) {
+                        const groupNum = zone.dataset.group || (zoneId === 'teacher-pool-2' ? '2' : (zoneId === 'teacher-pool-3' ? '3' : '1'));
+                        const poolEl = document.getElementById(`teacher-pool-${groupNum}`);
+                        if (poolEl) {
+                            const teacherIds = state.placements[zoneId];
+                            teacherIds.forEach(id => {
+                                // Find the teacher item ONLY inside the corresponding pool
+                                const item = poolEl.querySelector(`.teacher-item[data-id="${id}"]`);
+                                if (item) {
+                                    zone.appendChild(item);
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                // Restore inputs
+                for (const inputId in state.inputs) {
+                    const value = state.inputs[inputId];
+                    if (inputId.startsWith('input-index-')) {
+                        const index = parseInt(inputId.split('-index-')[1]);
+                        const input = document.querySelectorAll('input[type="text"]')[index];
+                        if (input) input.value = value;
+                    } else {
+                        const input = document.getElementById(inputId);
+                        if (input) input.value = value;
+                    }
+                }
+                
+                // Re-sort pools
+                ['1', '2', '3'].forEach(num => {
+                    const pool = document.getElementById(`teacher-pool-${num}`);
+                    if (pool) sortPool(pool);
+                });
+                
+                // Update all counts
+                updateNonHomeroomCounts();
+                updateDeptCounts();
+                updateSubjectStatsTable();
+                
+                return true;
+            } catch (e) {
+                console.error('Error loading state:', e);
+                return false;
+            }
+        }
+
+        function loadStateManual() {
+            const loaded = loadState();
+            if (loaded) {
+                alert('저장되었던 이전 작업을 성공적으로 불러왔습니다!');
+            } else {
+                alert('저장된 교무조직 편성 작업 내역이 존재하지 않습니다.');
+            }
+        }
+
+        function resetState() {
+            if (confirm('모든 배치 및 입력된 비고 내용을 초기화하고 처음부터 다시 시작하시겠습니까?')) {
+                localStorage.removeItem('jungmyung_org_state');
+                location.reload();
+            }
+        }
+
+        function savePDF() {
+            const element = document.getElementById('export-area');
+            element.classList.add('exporting');
+            
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     '2026학년도_교원명부.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.classList.remove('exporting');
+            });
+        }
+
+        function saveExcel() {
+            if (typeof XLSX === 'undefined') {
+                alert('Excel 라이브러리가 아직 로드되지 않았습니다. 잠시 후 다시 시도해 주세요.');
+                return;
+            }
+            
+            const wb = XLSX.utils.book_new();
+            
+            // Helper function to clone table and replace inputs/dropzones with clean text
+            function getCleanTable(table) {
+                const clonedTable = table.cloneNode(true);
+                
+                // Replace inputs with their current values
+                const originalInputs = table.querySelectorAll('input');
+                const clonedInputs = clonedTable.querySelectorAll('input');
+                for (let i = 0; i < originalInputs.length; i++) {
+                    const originalInput = originalInputs[i];
+                    const clonedInput = clonedInputs[i];
+                    const textNode = document.createTextNode(originalInput.value || '');
+                    clonedInput.parentNode.replaceChild(textNode, clonedInput);
+                }
+                
+                // Replace dropzones with comma-separated teacher names
+                const originalDropzones = table.querySelectorAll('.dropzone');
+                const clonedDropzones = clonedTable.querySelectorAll('.dropzone');
+                for (let i = 0; i < originalDropzones.length; i++) {
+                    const originalZone = originalDropzones[i];
+                    const clonedZone = clonedDropzones[i];
+                    const teachers = Array.from(originalZone.querySelectorAll('.teacher-item'));
+                    const names = teachers.map(t => t.dataset.name).join(', ');
+                    const textNode = document.createTextNode(names);
+                    clonedZone.parentNode.replaceChild(textNode, clonedZone);
+                }
+                
+                return clonedTable;
+            }
+
+            // Create Sheet 1: 전체 편성표 (Stacked Tables)
+            const wsAll = XLSX.utils.aoa_to_sheet([]);
+            let currentRow = 0;
+            
+            function appendTitle(ws, text) {
+                XLSX.utils.sheet_add_aoa(ws, [[text]], { origin: { r: currentRow, c: 0 } });
+                currentRow += 2;
+            }
+            
+            function appendTable(ws, table) {
+                const cleanTable = getCleanTable(table);
+                XLSX.utils.sheet_add_dom(ws, cleanTable, { origin: { r: currentRow, c: 0 } });
+                currentRow += cleanTable.rows.length + 2;
+            }
+            
+            // Document Title
+            XLSX.utils.sheet_add_aoa(wsAll, [["2026학년도 정명고등학교 교무조직 편성"]], { origin: { r: currentRow, c: 0 } });
+            currentRow += 2;
+            
+            // Section 1: 부장교사 및 교과부장
+            const t1 = document.querySelector('#export-area table');
+            if (t1) {
+                appendTitle(wsAll, "1. 부장교사 및 교과부장");
+                appendTable(wsAll, t1);
+            }
+            
+            // Section 2: 학년 담임 및 부담임 현황
+            const t2_1 = document.getElementById('grade1-body')?.closest('table');
+            const t2_2 = document.getElementById('grade2-body')?.closest('table');
+            const t2_3 = document.getElementById('grade3-body')?.closest('table');
+            if (t2_1 || t2_2 || t2_3) {
+                appendTitle(wsAll, "2. 학년 담임 및 부담임 현황");
+                if (t2_1) {
+                    XLSX.utils.sheet_add_aoa(wsAll, [["■ 1학년"]], { origin: { r: currentRow, c: 0 } });
+                    currentRow += 1;
+                    appendTable(wsAll, t2_1);
+                }
+                if (t2_2) {
+                    XLSX.utils.sheet_add_aoa(wsAll, [["■ 2학년"]], { origin: { r: currentRow, c: 0 } });
+                    currentRow += 1;
+                    appendTable(wsAll, t2_2);
+                }
+                if (t2_3) {
+                    XLSX.utils.sheet_add_aoa(wsAll, [["■ 3학년"]], { origin: { r: currentRow, c: 0 } });
+                    currentRow += 1;
+                    appendTable(wsAll, t2_3);
+                }
+            }
+            
+            // Section 3: 비담임 교사 현황
+            const t3 = document.querySelector('.non-homeroom-row')?.closest('table');
+            if (t3) {
+                appendTitle(wsAll, "3. 비담임 교사 현황");
+                appendTable(wsAll, t3);
+            }
+            
+            // Section 4: 부서별 교사현황
+            const t4 = document.getElementById('dept-body')?.closest('table');
+            if (t4) {
+                appendTitle(wsAll, "4. 부서별 교사현황");
+                appendTable(wsAll, t4);
+            }
+            
+            // Section 5: 과목별 교사현황
+            const t5 = document.getElementById('subject-stats-table');
+            if (t5) {
+                appendTitle(wsAll, "5. 과목별 교사현황");
+                appendTable(wsAll, t5);
+            }
+            
+            XLSX.utils.book_append_sheet(wb, wsAll, "전체 편성표");
+            
+            // Add individual worksheets for clean structure
+            if (t1) {
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(getCleanTable(t1)), "1. 부장 및 교과부장");
+            }
+            
+            if (t2_1 || t2_2 || t2_3) {
+                const wsGrades = XLSX.utils.aoa_to_sheet([]);
+                let gradeRow = 0;
+                if (t2_1) {
+                    XLSX.utils.sheet_add_aoa(wsGrades, [["1학년"]], { origin: { r: gradeRow, c: 0 } });
+                    gradeRow += 1;
+                    const cleanT2_1 = getCleanTable(t2_1);
+                    XLSX.utils.sheet_add_dom(wsGrades, cleanT2_1, { origin: { r: gradeRow, c: 0 } });
+                    gradeRow += cleanT2_1.rows.length + 2;
+                }
+                if (t2_2) {
+                    XLSX.utils.sheet_add_aoa(wsGrades, [["2학년"]], { origin: { r: gradeRow, c: 0 } });
+                    gradeRow += 1;
+                    const cleanT2_2 = getCleanTable(t2_2);
+                    XLSX.utils.sheet_add_dom(wsGrades, cleanT2_2, { origin: { r: gradeRow, c: 0 } });
+                    gradeRow += cleanT2_2.rows.length + 2;
+                }
+                if (t2_3) {
+                    XLSX.utils.sheet_add_aoa(wsGrades, [["3학년"]], { origin: { r: gradeRow, c: 0 } });
+                    gradeRow += 1;
+                    const cleanT2_3 = getCleanTable(t2_3);
+                    XLSX.utils.sheet_add_dom(wsGrades, cleanT2_3, { origin: { r: gradeRow, c: 0 } });
+                }
+                XLSX.utils.book_append_sheet(wb, wsGrades, "2. 학년 담임 및 부담임");
+            }
+            
+            if (t3) {
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(getCleanTable(t3)), "3. 비담임 교사 현황");
+            }
+            
+            if (t4) {
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(getCleanTable(t4)), "4. 부서별 교사현황");
+            }
+            
+            if (t5) {
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.table_to_sheet(getCleanTable(t5)), "5. 과목별 교사현황");
+            }
+            
+            // Export the workbook
+            XLSX.writeFile(wb, '2026학년도_정명고등학교_교무조직.xlsx');
+        }
+    </script>
+</body>
+</html>
